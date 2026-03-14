@@ -1,4 +1,8 @@
 import { up, cd, ls } from "./navigation.js";
+import { csvToJson } from "./commands/csvToJson.js";
+import { jsonToCsv } from "./commands/jsonToCsv.js";
+import { parseArgs } from "./utils/argParser.js";
+import resolvePath from "./utils/pathResolver.js";
 
 class InvalidInputError extends Error {
   constructor(message) {
@@ -13,6 +17,7 @@ export async function handleCommand(input, state) {
 
   const tokens = trimmed.split(/\s+/);
   const command = tokens[0];
+  const args = parseArgs(tokens.slice(1));
 
   try {
     switch (command) {
@@ -34,13 +39,31 @@ export async function handleCommand(input, state) {
       }
 
       case "csv-to-json": {
-        // will be filled in later
-        return { cwd: state.cwd, output: "" };
+        const { input: inputFile, output: outputFile } = args;
+        if (!inputFile || !outputFile) {
+          throw new InvalidInputError(
+            "Usage: csv-to-json --input <file> --output <file>",
+          );
+        }
+        await csvToJson(
+          resolvePath(state.cwd, inputFile),
+          resolvePath(state.cwd, outputFile),
+        );
+        return { cwd: state.cwd, output: `Converted to ${outputFile}` };
       }
 
       case "json-to-csv": {
-        // will be filled in later
-        return { cwd: state.cwd, output: "" };
+        const { input: inputFile, output: outputFile } = args;
+        if (!inputFile || !outputFile) {
+          throw new InvalidInputError(
+            "Usage: json-to-csv --input <file> --output <file>",
+          );
+        }
+        await jsonToCsv(
+          resolvePath(state.cwd, inputFile),
+          resolvePath(state.cwd, outputFile),
+        );
+        return { cwd: state.cwd, output: `Converted to ${outputFile}` };
       }
 
       case "count": {

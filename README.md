@@ -16,3 +16,8 @@ RS node.js course - data-processing-cli
 5. +8 up command moves up one directory level correctly
 6. +8 cd command navigates to specified directory (both relative and absolute paths)
 7. +12 ls command lists files and folders with proper sorting (folders first, then files, alphabetically)
+
+### Data Processing Commands
+
+8. +20 csv-to-json command works correctly (headers parsed, rows converted to objects, output is valid JSON array, uses Streams)
+Command to use: csv-to-json --input data.csv --output data.json

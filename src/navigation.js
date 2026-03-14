@@ -18,14 +18,15 @@ export async function cd(cwd, target) {
 
 export async function ls(cwd) {
   const entries = await fs.readdir(cwd, { withFileTypes: true });
+  const collator = new Intl.Collator(undefined, { sensitivity: 'base' });
 
   const dirs = entries
-    .filter((e) => e.isDirectory())
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .filter(e => e.isDirectory())
+    .sort((a, b) => collator.compare(a.name, b.name));
 
   const files = entries
-    .filter((e) => !e.isDirectory())
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .filter(e => !e.isDirectory())
+    .sort((a, b) => collator.compare(a.name, b.name));
 
   const sorted = [...dirs, ...files];
 
