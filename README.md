@@ -21,3 +21,9 @@ RS node.js course - data-processing-cli
 
 8. +20 csv-to-json command works correctly (headers parsed, rows converted to objects, output is valid JSON array, uses Streams)
 Command to use: csv-to-json --input data.csv --output data.json
+9. +20 json-to-csv command works correctly (headers from object keys, values as rows, uses Streams)
+Command to use: json-to-csv --input data.json --output data.csv
+10. +12 count command works correctly (lines, words, characters counted via Streams, output format matches specification)
+11. +12 hash command works correctly (SHA256 by default, supports md5 and sha512 via --algorithm option, uses Streams, supports --save to write hash file next to input)
+12. +8 encrypt command works correctly (AES-256-GCM, key derivation from password+salt, Streams, output format matches spec)
+13. +8 decrypt command works correctly (AES-256-GCM, key derivation from password+salt, Streams, authTag verified, result matches original)

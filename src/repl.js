@@ -1,6 +1,11 @@
 import { up, cd, ls } from "./navigation.js";
 import { csvToJson } from "./commands/csvToJson.js";
 import { jsonToCsv } from "./commands/jsonToCsv.js";
+import { count } from "./commands/count.js";
+import { hash } from "./commands/hash.js";
+import { hashCompare } from "./commands/hashCompare.js";
+import { encrypt } from "./commands/encrypt.js";
+import { decrypt } from "./commands/decrypt.js";
 import { parseArgs } from "./utils/argParser.js";
 import resolvePath from "./utils/pathResolver.js";
 
@@ -67,28 +72,76 @@ export async function handleCommand(input, state) {
       }
 
       case "count": {
-        // will be filled in later
-        return { cwd: state.cwd, output: "" };
+        const { input: inputFile } = args;
+        if (!inputFile) {
+          throw new InvalidInputError("Usage: count --input <file>");
+        }
+        const result = await count(resolvePath(state.cwd, inputFile));
+        const output = `Lines: ${result.lines}\nWords: ${result.words}\nCharacters: ${result.chars}`;
+        return { cwd: state.cwd, output };
       }
 
       case "hash": {
-        // will be filled in later
-        return { cwd: state.cwd, output: "" };
+        const { input: inputFile, algorithm, save } = args;
+        if (!inputFile) {
+          throw new InvalidInputError(
+            "Usage: hash --input <file> [--algorithm sha256|md5|sha512] [--save]",
+          );
+        }
+        const algoStr = typeof algorithm === "string" ? algorithm : "sha256";
+        const resolvedInput = resolvePath(state.cwd, inputFile);
+        const savePath = save ? `${resolvedInput}.${algoStr}` : null;
+        const result = await hash(resolvedInput, algoStr, savePath);
+        return {
+          cwd: state.cwd,
+          output: `${result.algorithm}: ${result.digest}`,
+        };
       }
 
       case "hash-compare": {
-        // will be filled in later
-        return { cwd: state.cwd, output: "" };
+        const { input: inputFile, hash: hashFile, algorithm } = args;
+        if (!inputFile || !hashFile) {
+          throw new InvalidInputError(
+            "Usage: hash-compare --input <file> --hash <hashfile> [--algorithm sha256|md5|sha512]",
+          );
+        }
+        const algoStr = typeof algorithm === "string" ? algorithm : "sha256";
+        const result = await hashCompare(
+          resolvePath(state.cwd, inputFile),
+          resolvePath(state.cwd, hashFile),
+          algoStr,
+        );
+        return { cwd: state.cwd, output: result.match ? "OK" : "MISMATCH" };
       }
 
       case "encrypt": {
-        // will be filled in later
-        return { cwd: state.cwd, output: "" };
+        const { input: inputFile, output: outputFile, password } = args;
+        if (!inputFile || !outputFile || !password) {
+          throw new InvalidInputError(
+            "Usage: encrypt --input <file> --output <file> --password <password>",
+          );
+        }
+        await encrypt(
+          resolvePath(state.cwd, inputFile),
+          resolvePath(state.cwd, outputFile),
+          password,
+        );
+        return { cwd: state.cwd, output: `Encrypted to ${outputFile}` };
       }
 
       case "decrypt": {
-        // will be filled in later
-        return { cwd: state.cwd, output: "" };
+        const { input: inputFile, output: outputFile, password } = args;
+        if (!inputFile || !outputFile || !password) {
+          throw new InvalidInputError(
+            "Usage: decrypt --input <file> --output <file> --password <password>",
+          );
+        }
+        await decrypt(
+          resolvePath(state.cwd, inputFile),
+          resolvePath(state.cwd, outputFile),
+          password,
+        );
+        return { cwd: state.cwd, output: `Decrypted to ${outputFile}` };
       }
 
       case "log-stats": {
