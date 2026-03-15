@@ -27,3 +27,20 @@ Command to use: json-to-csv --input data.json --output data.csv
 11. +12 hash command works correctly (SHA256 by default, supports md5 and sha512 via --algorithm option, uses Streams, supports --save to write hash file next to input)
 12. +8 encrypt command works correctly (AES-256-GCM, key derivation from password+salt, Streams, output format matches spec)
 13. +8 decrypt command works correctly (AES-256-GCM, key derivation from password+salt, Streams, authTag verified, result matches original)
+
+### Path Resolution
+14. +16 All file paths in commands are correctly resolved relative to current working directory
+15. +10 All file operations properly handle errors (non-existent files, invalid paths, permission errors)
+
+### Advanced Scope
+
+16. +26 log-stats command works correctly:
+17. +6 File is split into chunks equal to the number of CPU cores (line boundaries preserved)
+18. +10 Each chunk is processed in a separate Worker Thread
+19. +6 Partial stats are merged correctly (counters, maps, totals)
+20. +6 Final output JSON matches the specification
+21. +16 Project structure follows the specification (separate files for navigation, commands, utilities, worker)
+22. +20 Interactive REPL implementation:
+23. +10 Maintains application state (current working directory) across commands
+24. +10 Properly handles readline for continuous command input
+25. +10 hash-compare command works correctly (reads expected hash from file, computes current hash with selected algorithm, returns OK / MISMATCH)
